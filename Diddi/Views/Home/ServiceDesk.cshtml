@@ -1,0 +1,143 @@
+﻿@{
+    ViewData["Title"] = "ServiceDesk";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Desk</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0078d7;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            resize: vertical;
+        }
+        button {
+            background-color: #0078d7;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005bb5;
+        }
+        .ticket-list {
+            margin-top: 20px;
+        }
+        .ticket {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .ticket h3 {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Service Desk</h1>
+    </header>
+    <div class="container">
+        <h2>Создать заявку</h2>
+        <form id="ticketForm">
+            <div class="form-group">
+                <label for="title">Заголовок</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Описание</label>
+                <textarea id="description" name="description" rows="5" required></textarea>
+            </div>
+            <button type="submit">Создать</button>
+        </form>
+
+        <div class="ticket-list" id="ticketList">
+            <h2>Список заявок</h2>
+            <!-- Здесь будут отображаться заявки -->
+        </div>
+    </div>
+
+    <script>
+        // Примерный JavaScript для отправки и получения данных через API
+        const form = document.getElementById('ticketForm');
+        const ticketList = document.getElementById('ticketList');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            // Отправка данных на сервер
+            const response = await fetch('/api/tickets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description })
+            });
+
+            if (response.ok) {
+                alert('Заявка создана!');
+                form.reset();
+                loadTickets(); // Обновляем список заявок
+            } else {
+                alert('Ошибка при создании заявки.');
+            }
+        });
+
+        async function loadTickets() {
+            // Получение данных с сервера
+            const response = await fetch('/api/tickets');
+            if (response.ok) {
+                const tickets = await response.json();
+                ticketList.innerHTML = tickets.map(ticket => `
+                            <div class="ticket">
+                                <h3>${ticket.title}</h3>
+                                <p>${ticket.description}</p>
+                            </div>
+                        `).join('');
+            }
+        }
+
+        // Загрузка заявок при загрузке страницы
+        loadTickets();
+    </script>
+</body>
