@@ -9,18 +9,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service Desk</title>
     <style>
+        /* Стили остаются без изменений */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
             padding: 0;
         }
+
         header {
             background-color: #0078d7;
             color: #fff;
             padding: 10px 20px;
             text-align: center;
         }
+
         .container {
             margin: 20px auto;
             padding: 20px;
@@ -29,24 +32,25 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         .form-group {
             margin-bottom: 15px;
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .form-group textarea {
-            resize: vertical;
-        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 8px;
+                box-sizing: border-box;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
         button {
             background-color: #0078d7;
             color: #fff;
@@ -55,21 +59,10 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        button:hover {
-            background-color: #005bb5;
-        }
-        .ticket-list {
-            margin-top: 20px;
-        }
-        .ticket {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        .ticket h3 {
-            margin: 0 0 10px;
-        }
+
+            button:hover {
+                background-color: #005bb5;
+            }
     </style>
 </head>
 <body>
@@ -77,67 +70,125 @@
         <h1>Service Desk</h1>
     </header>
     <div class="container">
-        <h2>Создать заявку</h2>
-        <form id="ticketForm">
+        <h2>Поиск изображения по имени</h2>
+        <form id="searchForm">
             <div class="form-group">
-                <label for="title">Заголовок</label>
-                <input type="text" id="title" name="title" required>
+                <label for="searchName">Введите имя</label>
+                <input type="text" id="searchName" name="searchName" required>
+            </div>
+            <button type="submit">Искать</button>
+        </form>
+        <div id="searchResults" style="margin-top: 20px;">
+            <!-- Здесь будут отображаться результаты поиска -->
+        </div>
+
+        <h2>Список всех файлов</h2>
+        <button id="listFilesButton">Показать список файлов</button>
+        <div id="fileList" style="margin-top: 20px;">
+            <!-- Здесь будет отображаться список файлов -->
+        </div>
+
+        <h2>Загрузить изображение</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Имя</label>
+                <input type="text" id="name" name="name" required>
             </div>
             <div class="form-group">
-                <label for="description">Описание</label>
-                <textarea id="description" name="description" rows="5" required></textarea>
+                <label for="image">Выберите изображение</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
             </div>
-            <button type="submit">Создать</button>
+            <button type="submit">Загрузить</button>
         </form>
 
-        <div class="ticket-list" id="ticketList">
-            <h2>Список заявок</h2>
-            <!-- Здесь будут отображаться заявки -->
+        <h2>Получить изображение</h2>
+        <form id="viewForm">
+            <div class="form-group">
+                <label for="imageId">ID изображения</label>
+                <input type="number" id="imageId" name="imageId" required>
+            </div>
+            <button type="submit">Показать</button>
+        </form>
+        <div id="imagePreview" style="margin-top: 20px;">
+            <!-- Здесь будет отображаться изображение -->
         </div>
+
     </div>
 
     <script>
-        // Примерный JavaScript для отправки и получения данных через API
-        const form = document.getElementById('ticketForm');
-        const ticketList = document.getElementById('ticketList');
+        const uploadForm = document.getElementById('uploadForm');
+        const viewForm = document.getElementById('viewForm');
+        const imagePreview = document.getElementById('imagePreview');
+        const searchForm = document.getElementById('searchForm');
+        const listFilesButton = document.getElementById('listFilesButton');
+        const searchResults = document.getElementById('searchResults');
+        const fileList = document.getElementById('fileList');
 
-        form.addEventListener('submit', async (e) => {
+        // Загрузка изображения
+        uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const formData = new FormData(uploadForm);
 
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-
-            // Отправка данных на сервер
-            const response = await fetch('/api/tickets', {
+            const response = await fetch('/api/images/upload', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description })
+                body: formData
             });
 
             if (response.ok) {
-                alert('Заявка создана!');
-                form.reset();
-                loadTickets(); // Обновляем список заявок
+                alert('Изображение загружено!');
+                uploadForm.reset();
             } else {
-                alert('Ошибка при создании заявки.');
+                alert('Ошибка при загрузке изображения.');
             }
         });
 
-        async function loadTickets() {
-            // Получение данных с сервера
-            const response = await fetch('/api/tickets');
-            if (response.ok) {
-                const tickets = await response.json();
-                ticketList.innerHTML = tickets.map(ticket => `
-                            <div class="ticket">
-                                <h3>${ticket.title}</h3>
-                                <p>${ticket.description}</p>
-                            </div>
-                        `).join('');
-            }
-        }
+        // Получение изображения
+        viewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const imageId = document.getElementById('imageId').value;
 
-        // Загрузка заявок при загрузке страницы
-        loadTickets();
+            const response = await fetch(`/api/images/${imageId}`);
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+
+                imagePreview.innerHTML = `<img src="${url}" alt="Изображение" style="max-width: 100%; border: 1px solid #ccc; border-radius: 4px;">`;
+            } else {
+                alert('Изображение не найдено.');
+            }
+        });
+
+        // Поиск изображения по имени
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const searchName = document.getElementById('searchName').value;
+
+            const response = await fetch(`/api/images/search?name=${encodeURIComponent(searchName)}`);
+            if (response.ok) {
+                const results = await response.json();
+                searchResults.innerHTML = results.map(result => `
+                                <div>
+                                    <strong>ID:</strong> ${result.id} - <strong>Имя:</strong> ${result.name}
+                                </div>
+                            `).join('');
+            } else {
+                searchResults.innerHTML = '<p>Изображения с таким именем не найдены.</p>';
+            }
+        });
+
+        // Получение списка всех файлов
+        listFilesButton.addEventListener('click', async () => {
+            const response = await fetch('/api/images/list');
+            if (response.ok) {
+                const files = await response.json();
+                fileList.innerHTML = files.map(file => `
+                                <div>
+                                    <strong>ID:</strong> ${file.id} - <strong>Имя:</strong> ${file.name}
+                                </div>
+                            `).join('');
+            } else {
+                fileList.innerHTML = '<p>Список файлов недоступен.</p>';
+            }
+        });
     </script>
 </body>
