@@ -16,7 +16,7 @@ namespace Diddi.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadImage([FromForm] string name, [FromForm] IFormFile image)
+        public async Task<IActionResult> UploadImage(string name, IFormFile image)
         {
             if (image == null || image.Length == 0)
                 return BadRequest("Файл изображения обязателен.");

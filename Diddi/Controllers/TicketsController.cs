@@ -1,5 +1,6 @@
 ﻿using Diddi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Diddi.Controllers
 {
@@ -7,23 +8,27 @@ namespace Diddi.Controllers
     [Route("api/tickets")]
     public class TicketsController : ControllerBase
     {
-        private static List<Ticket> Tickets = new();
+        private readonly ApplicationContext _context;
+        public TicketsController(ApplicationContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
-        public IActionResult GetTickets()
+        public async Task<IActionResult> GetTickets()
         {
-            return Ok(Tickets);
+            return Ok(await _context.Ticket.ToListAsync());
         }
 
         [HttpPost]
-        public IActionResult CreateTicket([FromBody] Ticket newTicket)
+        public IActionResult CreateTicket([FromForm] Ticket newTicket)
         {
             if (string.IsNullOrEmpty(newTicket.Name) || string.IsNullOrEmpty(newTicket.Description))
             {
                 return BadRequest("Title and Description are required.");
             }
 
-            Tickets.Add(newTicket);
+            _context.Ticket.Add(newTicket);
             return Ok(newTicket);
         }
 
