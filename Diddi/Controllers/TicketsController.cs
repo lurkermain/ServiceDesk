@@ -21,7 +21,7 @@ namespace Diddi.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateTicket([FromForm] Ticket newTicket)
+        public IActionResult CreateTicket(string name, string description, DateTime createdDate, TicketPriority priority, TicketStatus status, )
         {
             if (string.IsNullOrEmpty(newTicket.Name) || string.IsNullOrEmpty(newTicket.Description))
             {

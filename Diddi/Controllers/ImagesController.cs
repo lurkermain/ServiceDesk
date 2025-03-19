@@ -25,13 +25,13 @@ namespace Diddi.Controllers
             {
                 await image.CopyToAsync(memoryStream);
 
-                var img = new Images
+                var img = new Files
                 {
                     Name = name,
-                    Image = memoryStream.ToArray()
+                    File = memoryStream.ToArray()
                 };
 
-                _context.Images.Add(img);
+                _context.Files.Add(img);
                 await _context.SaveChangesAsync();
 
                 return Ok(new { img.Id, img.Name });
@@ -41,18 +41,18 @@ namespace Diddi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetImage(int id)
         {
-            var img = await _context.Images.FindAsync(id);
+            var img = await _context.Files.FindAsync(id);
 
             if (img == null)
                 return NotFound();
 
-            return File(img.Image, "image/jpeg");
+            return File(img.File, "image/jpeg");
         }
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchImages([FromQuery] string name)
         {
-            var images = await _context.Images.Where(i => EF.Functions.Like(i.Name, $"%{name}%")).Select(i => new { i.Id, i.Name }).ToListAsync();
+            var images = await _context.Files.Where(i => EF.Functions.Like(i.Name, $"%{name}%")).Select(i => new { i.Id, i.Name }).ToListAsync();
 
             if (images.Count == 0)
                 return NotFound("Изображения с таким именем не найдены.");
@@ -63,7 +63,7 @@ namespace Diddi.Controllers
         [HttpGet("list")]
         public async Task<IActionResult> GetImageList()
         {
-            var imageList = await _context.Images.Select(i => new { i.Id, i.Name }).ToListAsync();
+            var imageList = await _context.Files.Select(i => new { i.Id, i.Name }).ToListAsync();
 
             return Ok(imageList);
         }

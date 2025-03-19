@@ -22,7 +22,7 @@ namespace Diddi.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Diddi.Models.Images", b =>
+            modelBuilder.Entity("Diddi.Models.Files", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,15 +30,22 @@ namespace Diddi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("Image")
+                    b.Property<byte[]>("File")
+                        .IsRequired()
                         .HasColumnType("bytea");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images");
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("Diddi.Models.Ticket", b =>
@@ -49,28 +56,37 @@ namespace Diddi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminHelper")
-                        .HasColumnType("text");
+                    b.Property<int?>("AdminHelperId")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool?>("IsClosed")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Owner")
-                        .HasColumnType("text");
+                    b.Property<int?>("OwnerId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("OwnerId")
-                        .HasColumnType("text");
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminHelperId");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Ticket");
                 });
@@ -87,14 +103,54 @@ namespace Diddi.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Diddi.Models.Files", b =>
+                {
+                    b.HasOne("Diddi.Models.Ticket", "Ticket")
+                        .WithMany("Files")
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+                });
+
+            modelBuilder.Entity("Diddi.Models.Ticket", b =>
+                {
+                    b.HasOne("Diddi.Models.Users", "AdminHelper")
+                        .WithMany()
+                        .HasForeignKey("AdminHelperId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Diddi.Models.Users", "Owner")
+                        .WithMany("Tickets")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AdminHelper");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Diddi.Models.Ticket", b =>
+                {
+                    b.Navigation("Files");
+                });
+
+            modelBuilder.Entity("Diddi.Models.Users", b =>
+                {
+                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }
