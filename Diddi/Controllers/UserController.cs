@@ -22,15 +22,20 @@ namespace Diddi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromForm] Users users)
+        public async Task<IActionResult> CreateUser([FromForm] UserCreateDto users)
         {
-            await _context.Users.AddAsync(users);
+            var user = new Users()
+            {
+                Name = users.Name,
+                Password = users.Password,
+            };
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
             return Ok();
         }
         [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromForm]Users updatedUser)
+        public async Task<IActionResult> UpdateUser(int id, [FromForm] UserCreateDto updatedUser)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -41,7 +46,6 @@ namespace Diddi.Controllers
 
             user.Name = updatedUser.Name;
             user.Password = updatedUser.Password;
-            user.IsAdmin = updatedUser.IsAdmin;
 
             await _context.SaveChangesAsync();
             return Ok();

@@ -1,9 +1,11 @@
 ﻿using static System.Net.Mime.MediaTypeNames;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Diddi.Models
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TicketPriority
     {
         Low,
@@ -11,7 +13,7 @@ namespace Diddi.Models
         High,
         Critical
     }
-
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TicketStatus
     {
         Open,
@@ -26,25 +28,23 @@ namespace Diddi.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime? UpdatedDate { get; set; }
 
         public TicketPriority Priority { get; set; } = TicketPriority.Medium;
         public TicketStatus Status { get; set; } = TicketStatus.Open;
 
-        public byte[] File { get; set; }
+        public byte[]? File { get; set; }
 
-        // Владелец тикета (Пользователь)
-        public int? OwnerId { get; set; }
+        // Владелец тикета (Обычный пользователь)
+        public int OwnerId { get; set; }
         [ForeignKey("OwnerId")]
         public Users? Owner { get; set; }
 
-        // Администратор, работающий с тикетом
+        // Администратор, назначенный на тикет
         public int? AdminHelperId { get; set; }
         [ForeignKey("AdminHelperId")]
-        public Users? AdminHelper { get; set; }
+        public Admin? AdminHelper { get; set; }
 
-        // Файлы, привязанные к тикету
-        public List<Files> Files { get; set; } = new();
     }
 }

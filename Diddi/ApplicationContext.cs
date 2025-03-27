@@ -8,34 +8,37 @@ namespace Diddi
 {
     public class ApplicationContext : DbContext
     {
-        public DbSet<Files> Files { get; set; }
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<Users> Users { get; set; }
         public DbSet<Ticket> Ticket { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
-/*            Database.EnsureDeleted();*/
-            Database.EnsureCreated();
+/*            Database.EnsureDeleted();
+            Database.EnsureCreated();*/
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Опционально: добавляем связи и ограничения
+            // Владелец тикета (Обычный пользователь)
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Owner)
                 .WithMany(u => u.Tickets)
                 .HasForeignKey(t => t.OwnerId)
-                .OnDelete(DeleteBehavior.Restrict); // Не удалять пользователя при удалении тикета
+                .OnDelete(DeleteBehavior.Restrict); // Не удаляем пользователя, если удалён тикет
 
+            // Администратор тикета (Админ)
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.AdminHelper)
-                .WithMany()
+                .WithMany(u => u.AssignedTickets)
                 .HasForeignKey(t => t.AdminHelperId)
                 .OnDelete(DeleteBehavior.SetNull); // Если админ удалён, тикет остаётся
 
-            modelBuilder.Entity<Files>()
-                .HasOne(i => i.Ticket)
-                .WithMany(t => t.Files)
-                .HasForeignKey(i => i.TicketId)
-                .OnDelete(DeleteBehavior.Cascade); // При удалении тикета удаляются все его файлы
+            // Убеждаемся, что администратором может быть только IsAdmin = true
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.AdminHelper)
+                .WithMany(u => u.AssignedTickets)
+                .HasForeignKey(t => t.AdminHelperId)
+                .HasConstraintName("FK_AdminMustBeAdmin")
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
