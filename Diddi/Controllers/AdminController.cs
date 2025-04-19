@@ -54,7 +54,7 @@ namespace Diddi.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateAdmin(int id, [FromBody] AdminCreateDto adminDto)
+        public async Task<IActionResult> UpdateAdmin(int id, [FromForm] AdminCreateDto adminDto)
         {
             var admin = await _context.Admins.FindAsync(id);
             if (admin == null)

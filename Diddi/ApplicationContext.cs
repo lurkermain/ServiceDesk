@@ -18,27 +18,13 @@ namespace Diddi
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Владелец тикета (Обычный пользователь)
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.Owner)
-                .WithMany(u => u.Tickets)
-                .HasForeignKey(t => t.OwnerId)
-                .OnDelete(DeleteBehavior.Restrict); // Не удаляем пользователя, если удалён тикет
+			modelBuilder.Entity<Ticket>()
+				.Property(t => t.CreatedDate)
+				.HasColumnType("timestamp without time zone");
 
-            // Администратор тикета (Админ)
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.AdminHelper)
-                .WithMany(u => u.AssignedTickets)
-                .HasForeignKey(t => t.AdminHelperId)
-                .OnDelete(DeleteBehavior.SetNull); // Если админ удалён, тикет остаётся
-
-            // Убеждаемся, что администратором может быть только IsAdmin = true
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.AdminHelper)
-                .WithMany(u => u.AssignedTickets)
-                .HasForeignKey(t => t.AdminHelperId)
-                .HasConstraintName("FK_AdminMustBeAdmin")
-                .OnDelete(DeleteBehavior.SetNull);
-        }
+			modelBuilder.Entity<Ticket>()
+				.Property(t => t.UpdatedDate)
+				.HasColumnType("timestamp without time zone");
+		}
     }
 }
