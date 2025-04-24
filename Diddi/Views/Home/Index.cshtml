@@ -1,14 +1,15 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Заявки";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to Service Desk</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">Заявки</h1>
+    <button class="btn btn-success mb-3" onclick="openCreateModal()">Добавить заявку</button>
+    <div id="ticket-list" class="row gy-4">
+        <!-- Tickets will be loaded here -->
+    </div>
 </div>
 
-<img src="/Images/seventeen.jpg" width="300" height="300" />
-<img src="/Images/GEKSY_RASPRYGALIS.gif" width="300" height="300" />
-
-<img src="/Images/undefined - Imgur.gif" width="300" height="300" />
-<img src="/Images/gif eso.gif" width="300" height="300" />
-
+@section Scripts {
+    <script src="~/js/tickets.js"></script>
+}

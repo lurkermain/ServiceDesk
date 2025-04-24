@@ -109,7 +109,7 @@ namespace Diddi.Controllers
 			if (ticket?.File == null)
 				return NotFound();
 
-			return File(ticket.File, "application/octet-stream", $"ticket_{id}_file");
+			return File(ticket.File, "application/octet-stream", $"ticket_{id}.png");
 		}
 
 
