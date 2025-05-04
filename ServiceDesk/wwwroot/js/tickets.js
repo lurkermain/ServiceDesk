@@ -13,7 +13,7 @@
                         <div class="card-body">
                             <h5 class="card-title">${ticket.name}</h5>
                             <p class="card-text">${ticket.description}</p>
-                            <p class="text-muted">Приоритет: <strong>${ticket.priority}</strong></p>
+                            <p class="text-muted priority-cell"><strong>${ticket.priority}</strong></p>
                             <p class="text-muted">Статус: <strong>${ticket.status}</strong></p>
                             <p class="text-muted small">Создано: ${new Date(ticket.createdDate).toLocaleString()}</p>
                             ${ticket.imageUrl ? `<a href="${ticket.imageUrl}" target="_blank" class="btn btn-sm btn-outline-primary">Картинка</a>` : ''}
@@ -115,4 +115,35 @@ document.getElementById("create-form").addEventListener("submit", function (e) {
         }
     });
 });
+
+function sortTicketsByPriority() {
+    const priorityOrder = { "Critical": 1, "High": 2, "Medium": 3, "Low": 4 };
+    const container = document.getElementById("ticket-list");
+    const cards = Array.from(container.querySelectorAll(".ticket-card"));
+
+    cards.sort((a, b) => {
+        const prioA = a.querySelector(".priority-cell strong").textContent.trim();
+        const prioB = b.querySelector(".priority-cell strong").textContent.trim();
+        return priorityOrder[prioA] - priorityOrder[prioB];
+    });
+
+    // Очистка и переотрисовка
+    container.innerHTML = "";
+    cards.forEach(card => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "col-md-4";
+        wrapper.appendChild(card);
+        container.appendChild(wrapper);
+    });
+}
+
+function filterTicketsByName() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const cards = document.querySelectorAll(".ticket-card");
+
+    cards.forEach(card => {
+        const name = card.querySelector(".name-cell").textContent.toLowerCase();
+        card.style.display = name.includes(query) ? "" : "none";
+    });
+}
 

@@ -8,9 +8,9 @@ namespace Diddi.Controllers
 		{
 			return View(); // Views/Home/Index.cshtml
 		}
-		/*public IActionResult ServiceDesk()
+		public IActionResult ServiceDesk()
 		{
 			return View();
-		}*/
+		}
 	}
 }

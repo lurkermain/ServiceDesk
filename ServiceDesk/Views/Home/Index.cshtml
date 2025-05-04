@@ -1,6 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Заявки";
 }
+<div class="d-flex mb-3 gap-2">
+    <input type="text" id="searchInput" class="form-control w-25" placeholder="Поиск по названию..." oninput="filterTicketsByName()" />
+    <button class="btn btn-outline-primary" onclick="sortTicketsByPriority()">Сортировать по приоритету</button>
+</div>
 
 <div class="container mt-4">
     <h1 class="mb-4">Заявки</h1>
