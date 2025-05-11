@@ -19,7 +19,7 @@ namespace Diddi.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetTickets()
 		{
-			var tickets = await _context.Ticket
+			var tickets = await _context.Ticket.OrderByDescending(x=> x.UpdatedDate).ThenByDescending(x=> x.CreatedDate)
 		.Select(t => new
 		{
 			Id = t.Id,

@@ -13,9 +13,10 @@
                         <div class="card-body">
                             <h5 class="card-title">${ticket.name}</h5>
                             <p class="card-text">${ticket.description}</p>
-                            <p class="text-muted priority-cell"><strong>${ticket.priority}</strong></p>
+                            <p class="text-muted priority-cell">Приоритет: <strong>${ticket.priority}</strong></p>
                             <p class="text-muted">Статус: <strong>${ticket.status}</strong></p>
                             <p class="text-muted small">Создано: ${new Date(ticket.createdDate).toLocaleString()}</p>
+                            <p class="text-muted small">Обновлено: ${new Date(ticket.updatedDate).toLocaleString()}</p>
                             ${ticket.imageUrl ? `<a href="${ticket.imageUrl}" target="_blank" class="btn btn-sm btn-outline-primary">Картинка</a>` : ''}
                         </div>
                     </div>
@@ -116,34 +117,69 @@ document.getElementById("create-form").addEventListener("submit", function (e) {
     });
 });
 
+let isSortedByPriorityAsc = true; // Начинаем с сортировки по убыванию
+
 function sortTicketsByPriority() {
     const priorityOrder = { "Critical": 1, "High": 2, "Medium": 3, "Low": 4 };
     const container = document.getElementById("ticket-list");
     const cards = Array.from(container.querySelectorAll(".ticket-card"));
 
+    // Сортируем карточки по приоритету в зависимости от текущего состояния сортировки
     cards.sort((a, b) => {
-        const prioA = a.querySelector(".priority-cell strong").textContent.trim();
-        const prioB = b.querySelector(".priority-cell strong").textContent.trim();
-        return priorityOrder[prioA] - priorityOrder[prioB];
+        const prioA = a.querySelector(".priority-cell strong")?.textContent.trim();
+        const prioB = b.querySelector(".priority-cell strong")?.textContent.trim();
+
+        const valueA = priorityOrder[prioA] || Infinity;
+        const valueB = priorityOrder[prioB] || Infinity;
+
+        return isSortedByPriorityAsc ? valueA - valueB : valueB - valueA;
     });
 
-    // Очистка и переотрисовка
+    // Очистка контейнера
     container.innerHTML = "";
+
+    // Перерисовываем карточки в новом порядке
     cards.forEach(card => {
         const wrapper = document.createElement("div");
         wrapper.className = "col-md-4";
         wrapper.appendChild(card);
         container.appendChild(wrapper);
     });
+
+    // Переключаем состояние сортировки
+    isSortedByPriorityAsc = !isSortedByPriorityAsc;
 }
+
+function sortTicketsByNew() {
+    isNewestFirst = !isNewestFirst;
+    updateSortButton();
+
+    const container = document.getElementById("ticket-list");
+    const cards = Array.from(container.querySelectorAll(".ticket-card"));
+
+    cards.sort((a, b) => {
+        const dateA = new Date(a.getAttribute('data-created-date'));
+        const dateB = new Date(b.getAttribute('data-created-date'));
+        return isNewestFirst ? dateB - dateA : dateA - dateB;
+    });
+
+    container.innerHTML = "";
+    cards.forEach(card => container.appendChild(card));
+}
+
 
 function filterTicketsByName() {
     const query = document.getElementById("searchInput").value.toLowerCase();
-    const cards = document.querySelectorAll(".ticket-card");
+    const cardContainers = document.querySelectorAll("#ticket-list .col-md-4"); // Ищем именно контейнеры колонок
 
-    cards.forEach(card => {
-        const name = card.querySelector(".name-cell").textContent.toLowerCase();
-        card.style.display = name.includes(query) ? "" : "none";
+    cardContainers.forEach(container => {
+        const card = container.querySelector(".ticket-card");
+        if (!card) return;
+
+        const nameElement = card.querySelector(".card-title");
+        const name = nameElement ? nameElement.textContent.toLowerCase() : "";
+
+        // Скрываем/показываем всю колонку (col-md-4), а не только карточку
+        container.style.display = name.includes(query) ? "" : "none";
     });
 }
-
