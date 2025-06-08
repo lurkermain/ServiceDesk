@@ -4,9 +4,6 @@
 <div class="d-flex mb-3 gap-2">
     <input type="text" id="searchInput" class="form-control w-25" placeholder="Поиск по названию..." oninput="filterTicketsByName()" />
     <button class="btn btn-outline-primary" onclick="sortTicketsByPriority()">Сортировать по приоритету</button>
-    @* <button id="sort-date-btn" class="btn btn-outline-secondary" onclick="sortTicketsByDate()">
-        <i class="bi bi-clock-history"></i> По дате обновления
-    </button> *@
     <a href="/api/tickets/export" class="btn btn-primary">Скачать отчет</a>
 </div>
 
